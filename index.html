@@ -44,9 +44,23 @@
       background: rgba(255,255,255,0.3);
       transform: scale(1.05);
     }
+    #searchBox {
+      border: none;
+      border-radius: 20px;
+      padding: 8px 15px;
+      outline: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 0.9em;
+      margin-right: 20px;
+      transition: 0.3s;
+    }
+    #searchBox:focus {
+      background: rgba(255,255,255,0.2);
+    }
     .products {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 40px;
       padding: 60px;
       place-items: center;
@@ -95,6 +109,45 @@
       transform: scale(1.1);
       box-shadow: 0 0 15px #00f5a0;
     }
+
+    /* Cart Panel */
+    #cartPanel {
+      position: fixed;
+      right: -400px;
+      top: 0;
+      height: 100%;
+      width: 320px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+      transition: 0.4s ease;
+      padding: 20px;
+      z-index: 2000;
+      overflow-y: auto;
+    }
+    #cartPanel.active {
+      right: 0;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 10px;
+    }
+    .cart-item span {
+      font-size: 0.9em;
+    }
+    .cart-item button {
+      background: linear-gradient(135deg, #ff8177, #ffcc70);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    /* Checkout Button */
     .checkout {
       text-align: center;
       margin: 40px 0;
@@ -114,6 +167,7 @@
       transform: scale(1.05);
       box-shadow: 0 0 20px #ffcc70;
     }
+
     /* Popup */
     #popup {
       position: fixed;
@@ -165,41 +219,24 @@
 
   <header>
     <h1>🛍️ Priyanshu Store</h1>
-    <div id="cart">🛒 Cart: ₹<span id="total">0</span></div>
+    <div style="display:flex; align-items:center;">
+      <input type="text" id="searchBox" placeholder="Search product...">
+      <div id="cart">🛒 Cart (<span id="cartCount">0</span>)</div>
+    </div>
   </header>
 
-  <section class="products">
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab" alt="">
-      <h3>Classic T-Shirt</h3>
-      <p>₹499</p>
-      <button onclick="addToCart(499)">Add to Cart</button>
-    </div>
-
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1585386959984-a41552231693" alt="">
-      <h3>Running Shoes</h3>
-      <p>₹1299</p>
-      <button onclick="addToCart(1299)">Add to Cart</button>
-    </div>
-
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1519741497674-611481863552" alt="">
-      <h3>Stylish Watch</h3>
-      <p>₹999</p>
-      <button onclick="addToCart(999)">Add to Cart</button>
-    </div>
-
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1600181952909-92d88e1e4b1b" alt="">
-      <h3>Denim Jacket</h3>
-      <p>₹899</p>
-      <button onclick="addToCart(899)">Add to Cart</button>
-    </div>
+  <section class="products" id="productContainer">
+    <!-- Products will auto-generate from JS -->
   </section>
 
   <div class="checkout">
     <button onclick="checkout()">Proceed to Checkout</button>
+  </div>
+
+  <div id="cartPanel">
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <h3>Total: ₹<span id="total">0</span></h3>
   </div>
 
   <!-- Popup -->
@@ -212,29 +249,89 @@
   </div>
 
   <script>
-    let total = 0;
+    const products = [
+      {name: "Classic T-Shirt", price: 499, img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
+      {name: "Running Shoes", price: 1299, img: "https://images.unsplash.com/photo-1585386959984-a41552231693"},
+      {name: "Stylish Watch", price: 999, img: "https://images.unsplash.com/photo-1519741497674-611481863552"},
+      {name: "Denim Jacket", price: 899, img: "https://images.unsplash.com/photo-1600181952909-92d88e1e4b1b"},
+      {name: "Leather Wallet", price: 499, img: "https://images.unsplash.com/photo-1585386959984-a41552231693"},
+      {name: "Wireless Earbuds", price: 1499, img: "https://images.unsplash.com/photo-1603791452906-c8c6cfb12d5a"}
+    ];
 
-    function addToCart(price) {
-      total += price;
-      document.getElementById("total").innerText = total;
-      const cart = document.getElementById("cart");
-      cart.style.transform = "scale(1.2)";
-      setTimeout(() => (cart.style.transform = "scale(1)"), 200);
+    let cart = [];
+
+    function loadProducts() {
+      const container = document.getElementById("productContainer");
+      container.innerHTML = "";
+      products.forEach((p, i) => {
+        container.innerHTML += `
+          <div class="card">
+            <img src="${p.img}" alt="">
+            <h3>${p.name}</h3>
+            <p>₹${p.price}</p>
+            <button onclick="addToCart(${i})">Add to Cart</button>
+          </div>`;
+      });
+    }
+
+    function addToCart(index) {
+      const item = products[index];
+      const existing = cart.find(c => c.name === item.name);
+      if (existing) existing.qty++;
+      else cart.push({...item, qty: 1});
+      updateCart();
+      document.getElementById("cartPanel").classList.add("active");
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(i => i.name !== name);
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById("cartItems");
+      const totalElem = document.getElementById("total");
+      const cartCount = document.getElementById("cartCount");
+      cartItems.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.qty;
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <span>${item.name} (x${item.qty})</span>
+            <button onclick="removeFromCart('${item.name}')">Remove</button>
+          </div>`;
+      });
+      totalElem.innerText = total;
+      cartCount.innerText = cart.length;
     }
 
     function checkout() {
-      if (total === 0) {
-        alert("Your cart is empty!");
-        return;
-      }
+      if (cart.length === 0) return alert("Your cart is empty!");
       document.getElementById("popup").classList.add("active");
-      total = 0;
-      document.getElementById("total").innerText = "0";
+      cart = [];
+      updateCart();
+      document.getElementById("cartPanel").classList.remove("active");
     }
 
     function closePopup() {
       document.getElementById("popup").classList.remove("active");
     }
+
+    // search filter
+    document.getElementById("searchBox").addEventListener("input", (e) => {
+      const val = e.target.value.toLowerCase();
+      document.querySelectorAll(".card").forEach(card => {
+        const name = card.querySelector("h3").innerText.toLowerCase();
+        card.style.display = name.includes(val) ? "block" : "none";
+      });
+    });
+
+    document.getElementById("cart").addEventListener("click", () => {
+      document.getElementById("cartPanel").classList.toggle("active");
+    });
+
+    loadProducts();
   </script>
 </body>
 </html>
