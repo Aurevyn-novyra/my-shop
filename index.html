@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glassy Shop | Priyanshu Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at top, #0f0f0f, #000);
+      color: #fff;
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 1.8em;
+      letter-spacing: 1px;
+    }
+    #cart {
+      background: rgba(255,255,255,0.1);
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #cart:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 40px;
+      padding: 60px;
+      place-items: center;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255,255,255,0.05);
+      transition: 0.4s ease;
+      backdrop-filter: blur(15px);
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-10px) scale(1.03);
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+    }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 15px;
+    }
+    .card h3 {
+      margin: 10px 0 5px;
+      font-weight: 600;
+    }
+    .card p {
+      font-size: 1em;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+    .card button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #00f5a0, #00d9f5);
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .card button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #00f5a0;
+    }
+    .checkout {
+      text-align: center;
+      margin: 40px 0;
+    }
+    .checkout button {
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #ffcc70, #ff8177);
+      border: none;
+      border-radius: 40px;
+      color: #000;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .checkout button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #ffcc70;
+    }
+    /* Popup */
+    #popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.3s;
+    }
+    #popup.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .popup-box {
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      backdrop-filter: blur(15px);
+      animation: popupAnim 0.5s ease;
+    }
+    @keyframes popupAnim {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .popup-box h2 {
+      margin-bottom: 10px;
+      font-size: 1.8em;
+    }
+    .popup-box button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      background: linear-gradient(135deg, #00f5a0, #00d9f5);
+      border: none;
+      border-radius: 25px;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🛍️ Priyanshu Store</h1>
+    <div id="cart">🛒 Cart: ₹<span id="total">0</span></div>
+  </header>
+
+  <section class="products">
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab" alt="">
+      <h3>Classic T-Shirt</h3>
+      <p>₹499</p>
+      <button onclick="addToCart(499)">Add to Cart</button>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1585386959984-a41552231693" alt="">
+      <h3>Running Shoes</h3>
+      <p>₹1299</p>
+      <button onclick="addToCart(1299)">Add to Cart</button>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1519741497674-611481863552" alt="">
+      <h3>Stylish Watch</h3>
+      <p>₹999</p>
+      <button onclick="addToCart(999)">Add to Cart</button>
+    </div>
+
+    <div class="card">
+      <img src="https://images.unsplash.com/photo-1600181952909-92d88e1e4b1b" alt="">
+      <h3>Denim Jacket</h3>
+      <p>₹899</p>
+      <button onclick="addToCart(899)">Add to Cart</button>
+    </div>
+  </section>
+
+  <div class="checkout">
+    <button onclick="checkout()">Proceed to Checkout</button>
+  </div>
+
+  <!-- Popup -->
+  <div id="popup">
+    <div class="popup-box">
+      <h2>🎉 Payment Successful!</h2>
+      <p>Thank you for shopping with Priyanshu Store ❤️</p>
+      <button onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    let total = 0;
+
+    function addToCart(price) {
+      total += price;
+      document.getElementById("total").innerText = total;
+      const cart = document.getElementById("cart");
+      cart.style.transform = "scale(1.2)";
+      setTimeout(() => (cart.style.transform = "scale(1)"), 200);
+    }
+
+    function checkout() {
+      if (total === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      document.getElementById("popup").classList.add("active");
+      total = 0;
+      document.getElementById("total").innerText = "0";
+    }
+
+    function closePopup() {
+      document.getElementById("popup").classList.remove("active");
+    }
+  </script>
+</body>
+</html>
